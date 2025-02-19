@@ -122,7 +122,7 @@ const Comments = ({ bookId }) => {
                 {formatDate(comment.created_at)}
               </div>
             </div>
-            <p className='mb-4 text-black/80'>{comment.yorum}</p>
+            <p className='text-black/80'>{comment.yorum}</p>
           </motion.div>
         ))}
 

@@ -7,9 +7,9 @@ const Header = () => {
       <a href='http://ozgenaz.com/' className='flex w-full items-center gap-1'>
         <FaArrowLeft className='size-6 md:size-8' />
       </a>
-      <div className='w-full'>
+      <a href='/' className='w-full'>
         <img src='/images/logo.png' className='mx-auto w-24 md:w-32' />
-      </div>
+      </a>
       <div className='w-full'></div>
     </div>
   );

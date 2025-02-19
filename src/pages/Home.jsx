@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import { FaArrowRight, FaBook } from 'react-icons/fa6';
 import Header from '@components/Header';
 import Footer from '@components/Footer';
-
+import SplashScreen from 'src/layout/Loader';
 const LogoPattern = () => (
   <div className='fixed inset-0 z-0 grid grid-cols-6 gap-4 p-4'>
     {Array(36)
@@ -53,9 +53,8 @@ const BookCard = ({ kitap, index }) => {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: index * 0.4 }}
-        >
-          {truncateText(kitap.aciklama, 60)}
-        </motion.p>
+          dangerouslySetInnerHTML={{ __html: truncateText(kitap.aciklama, 100) }}
+        ></motion.p>
         <motion.a
           href={`kitap/${kitap.kitapId}`}
           className='mt-2 flex w-full cursor-pointer items-center justify-center gap-2 rounded-4xl bg-[#f5c318] py-2 text-black'
@@ -71,6 +70,7 @@ const BookCard = ({ kitap, index }) => {
 
 const Home = () => {
   const [kitapData, setKitapData] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchBooks = async () => {
@@ -79,6 +79,7 @@ const Home = () => {
         const data = await response.json();
         console.log(data.books);
         setKitapData(data.books);
+        setLoading(false);
       } catch (error) {
         console.error('Kitap verisi alınamadı:', error);
       }
@@ -86,6 +87,10 @@ const Home = () => {
 
     fetchBooks();
   }, []);
+
+  if (loading) {
+    return <SplashScreen />;
+  }
 
   return (
     <div className='flex min-h-screen flex-col scroll-smooth bg-neutral-100/20 px-2 md:px-0'>
