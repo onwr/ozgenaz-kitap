@@ -21,7 +21,7 @@ const ContentModal = ({
           exit={{ opacity: 0 }}
         >
           <motion.div
-            className='relative z-50 h-full max-h-[100vh] w-full overflow-y-auto bg-white md:rounded-2xl'
+            className='relative z-50 h-full max-h-[100vh] w-full overflow-y-auto bg-white md:rounded-2xl dark:bg-gradient-to-b dark:from-[#cfbc95]/70 dark:to-white/20'
             initial={{ scale: 0.9, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             exit={{ scale: 0.9, opacity: 0 }}

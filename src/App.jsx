@@ -4,6 +4,10 @@ import Home from './pages/Home';
 import SplashScreen from './layout/Loader';
 import KitapDetay from './pages/KitapDetay';
 import Login from './pages/admin/Login';
+import { ThemeProvider } from './context/ThemeContext';
+import { AuthProvider } from './context/AuthContext';
+import ProtectedRoute from '@components/ProtectedRoute';
+import Panel from './pages/admin/Panel';
 
 const App = () => {
   const [loading, setLoading] = useState(true);
@@ -21,13 +25,25 @@ const App = () => {
   }
 
   return (
-    <BrowserRouter>
-      <Routes>
-        <Route path='/' element={<Home />} />
-        <Route path='/kitap/:id' element={<KitapDetay />} />
-        <Route path='/yazarpanel/giris' element={<Login />} />
-      </Routes>
-    </BrowserRouter>
+    <ThemeProvider>
+      <AuthProvider>
+        <BrowserRouter>
+          <Routes>
+            <Route path='/' element={<Home />} />
+            <Route path='/kitap/:id' element={<KitapDetay />} />
+            <Route path='/yazarpanel/giris' element={<Login />} />
+            <Route
+              path='/yazarpanel'
+              element={
+                <ProtectedRoute>
+                  <Panel />
+                </ProtectedRoute>
+              }
+            />
+          </Routes>
+        </BrowserRouter>
+      </AuthProvider>
+    </ThemeProvider>
   );
 };
 

@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
-import { FaHeart } from 'react-icons/fa6';
 import SplashScreen from 'src/layout/Loader';
 import ContentPopup from 'src/modals/ContentModal';
 
@@ -53,7 +52,7 @@ const Bolumler = ({ kitapId }) => {
 
   return (
     <motion.div
-      className='z-50 container mx-auto mt-5 grid grid-cols-1 gap-5 rounded-2xl border border-black/20 bg-white p-5 md:grid-cols-2'
+      className='z-50 container mx-auto mt-5 grid grid-cols-1 gap-5 rounded-2xl border border-black/20 bg-white p-5 md:grid-cols-2 dark:border-0 dark:bg-gradient-to-b dark:from-[#cfbc95]/70 dark:to-white/20'
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.4 }}
@@ -61,7 +60,7 @@ const Bolumler = ({ kitapId }) => {
       {bolumler &&
         bolumler.map((bolum, index) => (
           <motion.div
-            className='flex flex-col gap-2 rounded-lg bg-black/5 p-4 lg:flex-row lg:items-center lg:justify-between lg:gap-0'
+            className='flex flex-col gap-2 rounded-lg bg-black/5 p-4 lg:flex-row lg:items-center lg:justify-between lg:gap-0 dark:border dark:border-black/40 dark:bg-white/60'
             key={index}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}

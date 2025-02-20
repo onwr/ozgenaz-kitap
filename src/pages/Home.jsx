@@ -5,7 +5,7 @@ import Header from '@components/Header';
 import Footer from '@components/Footer';
 import SplashScreen from 'src/layout/Loader';
 const LogoPattern = () => (
-  <div className='fixed inset-0 z-0 grid grid-cols-6 gap-4 p-4'>
+  <div className='fixed inset-0 z-0 grid grid-cols-6 gap-4 p-4 dark:bg-gradient-to-b dark:from-[#cfbc95] dark:to-white/40'>
     {Array(36)
       .fill(null)
       .map((_, index) => (
@@ -33,7 +33,7 @@ const BookCard = ({ kitap, index }) => {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, delay: index * 0.2 }}
       whileHover={{ scale: 1.02 }}
-      className='flex flex-col gap-2 rounded-4xl border border-black/30 py-4 md:shadow-2xl'
+      className='flex flex-col gap-2 rounded-4xl border border-black/30 py-4 md:shadow-2xl dark:border-0 dark:bg-gradient-to-b dark:from-[#cfbc95]/70 dark:to-white'
     >
       <motion.img
         src={kitap.resim ? kitap.resim : '/images/logo.png'}
@@ -57,7 +57,7 @@ const BookCard = ({ kitap, index }) => {
         ></motion.p>
         <motion.a
           href={`kitap/${kitap.kitapId}`}
-          className='mt-2 flex w-full cursor-pointer items-center justify-center gap-2 rounded-4xl bg-[#f5c318] py-2 text-black'
+          className='mt-2 flex w-full cursor-pointer items-center justify-center gap-2 rounded-4xl py-2 text-black dark:bg-gradient-to-r dark:from-[#cfbc95]/70 dark:to-white/20'
           whileHover={{ scale: 1.05, backgroundColor: '#f3bb0d' }}
           whileTap={{ scale: 0.95 }}
         >
@@ -77,7 +77,6 @@ const Home = () => {
       try {
         const response = await fetch('http://45.143.4.156:3000/books');
         const data = await response.json();
-        console.log(data.books);
         setKitapData(data.books);
         setLoading(false);
       } catch (error) {
@@ -93,11 +92,11 @@ const Home = () => {
   }
 
   return (
-    <div className='flex min-h-screen flex-col scroll-smooth bg-neutral-100/20 px-2 md:px-0'>
+    <div className='flex min-h-screen flex-col scroll-smooth bg-neutral-100/20 px-2 md:px-0 dark:bg-[#040505]/70'>
       <LogoPattern />
       <Header />
       <motion.div
-        className='relative z-10 container mx-auto my-5 grid grid-cols-1 gap-5 rounded-4xl border border-black/20 bg-white p-5 lg:grid-cols-2'
+        className='relative z-10 container mx-auto my-5 grid grid-cols-1 gap-5 rounded-4xl border border-black/20 bg-white p-5 backdrop-blur-md lg:grid-cols-2 dark:bg-gradient-to-b dark:from-[#cfbc95]/70 dark:to-white/20'
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}

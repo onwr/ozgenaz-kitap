@@ -2,13 +2,33 @@ import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { FaClock } from 'react-icons/fa6';
 import axios from 'axios';
+import { MdDelete } from 'react-icons/md';
 
 const Comments = ({ bookId }) => {
+  const adminToken = localStorage.getItem('adminToken');
   const [ad, setAd] = useState('');
   const [comment, setComment] = useState('');
   const [comments, setComments] = useState([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState(null);
+
+  const deleteComment = async (commentId) => {
+    try {
+      const response = await fetch(`http://45.143.4.156:3000/comments/${commentId}`, {
+        method: 'DELETE',
+        headers: {
+          Authorization: `Bearer ${adminToken}`,
+        },
+      });
+      if (response.ok) {
+        await fetchComments();
+      } else {
+        alert('Silme işlemi başarısız');
+      }
+    } catch (error) {
+      console.error('Hata:', error);
+    }
+  };
 
   const fetchComments = async () => {
     try {
@@ -68,7 +88,7 @@ const Comments = ({ bookId }) => {
 
   return (
     <motion.div
-      className='z-10 container mx-auto mt-5 gap-5 rounded-2xl border border-black/20 bg-white p-5'
+      className='z-10 container mx-auto mt-5 gap-5 rounded-2xl border border-black/20 bg-white p-5 dark:bg-gradient-to-b dark:from-[#cfbc95]/70 dark:to-white/20'
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.6 }}
@@ -81,7 +101,7 @@ const Comments = ({ bookId }) => {
             value={ad}
             required
             onChange={(e) => setAd(e.target.value)}
-            className='w-full rounded-xl border border-black/20 p-4 focus:ring-2 focus:ring-black/20 focus:outline-none'
+            className='w-full rounded-xl border border-black/20 p-4 focus:ring-2 focus:ring-black/20 focus:outline-none dark:placeholder-black/70'
             placeholder='Adınız'
             disabled={isSubmitting}
           />
@@ -89,7 +109,7 @@ const Comments = ({ bookId }) => {
             value={comment}
             required
             onChange={(e) => setComment(e.target.value)}
-            className='w-full resize-none rounded-xl border border-black/20 p-4 focus:ring-2 focus:ring-black/20 focus:outline-none'
+            className='w-full resize-none rounded-xl border border-black/20 p-4 focus:ring-2 focus:ring-black/20 focus:outline-none dark:placeholder-black/70'
             placeholder='Yorumunuzu yazın...'
             rows='4'
             disabled={isSubmitting}
@@ -111,7 +131,7 @@ const Comments = ({ bookId }) => {
         {comments.map((comment) => (
           <motion.div
             key={comment.id}
-            className='rounded-xl bg-black/5 p-4'
+            className='rounded-xl bg-black/5 p-4 dark:border dark:border-black/40 dark:bg-white/70'
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
           >
@@ -120,6 +140,14 @@ const Comments = ({ bookId }) => {
               <div className='flex items-center gap-2 text-sm text-black/60'>
                 <FaClock />
                 {formatDate(comment.created_at)}
+                {adminToken && (
+                  <button
+                    onClick={() => deleteComment(comment.id)}
+                    className='cursor-pointer rounded-full bg-red-500 p-1 text-white duration-300 hover:bg-red-700'
+                  >
+                    <MdDelete />
+                  </button>
+                )}
               </div>
             </div>
             <p className='text-black/80'>{comment.yorum}</p>
