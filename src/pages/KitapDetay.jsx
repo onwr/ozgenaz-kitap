@@ -1,15 +1,14 @@
 import Header from '@components/Header';
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import Footer from '@components/Footer';
-import { FaArrowLeft, FaArrowRight, FaBookOpen } from 'react-icons/fa6';
 import Comments from '@components/Comments';
 import SplashScreen from 'src/layout/Loader';
 import Bolumler from '@components/Bolumler';
 
 const LogoPattern = () => (
-  <div className='fixed inset-0 z-0 grid grid-cols-6 gap-4 p-4 dark:bg-gradient-to-b dark:from-[#cfbc95] dark:to-white/40'>
+  <div className='fixed inset-0 z-0 grid grid-cols-6 gap-4 p-4 dark:bg-[#1a1a1a]'>
     {Array(36)
       .fill(null)
       .map((_, index) => (
@@ -29,11 +28,12 @@ const KitapDetay = () => {
   const { id } = useParams();
   const [kitapData, setKitapData] = useState({});
   const [loading, setLoading] = useState(true);
+  const API_BASE_URL = 'http://82.29.178.21:3000';
 
   useEffect(() => {
     const fetchBookData = async () => {
       try {
-        const response = await fetch(`http://45.143.4.156:3000/books/${id}`);
+        const response = await fetch(`${API_BASE_URL}/books/${id}`);
         const data = await response.json();
         setKitapData(data);
         setLoading(false);
@@ -50,11 +50,11 @@ const KitapDetay = () => {
   }
 
   return (
-    <div className='flex min-h-screen flex-col scroll-smooth bg-neutral-100/20 px-2 select-none md:px-0 dark:bg-gradient-to-b dark:from-[#cfbc95]/70 dark:to-white/20'>
+    <div className='flex min-h-screen flex-col scroll-smooth bg-neutral-100/20 px-2 select-none md:px-0 dark:bg-[#1a1a1a]'>
       <LogoPattern />
       <Header />
       <motion.div
-        className='z-50 container mx-auto mt-5 flex flex-col-reverse gap-5 rounded-2xl border border-black/20 bg-white p-5 lg:flex-row dark:border-0 dark:bg-gradient-to-b dark:from-[#cfbc95]/70 dark:to-white/20'
+        className='z-50 container mx-auto mt-5 flex flex-col-reverse gap-5 rounded-2xl border border-black/20 bg-white p-5 lg:flex-row dark:border-0 dark:bg-[#262626] dark:text-white'
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
@@ -74,7 +74,7 @@ const KitapDetay = () => {
             {kitapData.kitapAd}
           </motion.h1>
           <motion.p
-            className='text-center text-base leading-relaxed font-medium text-black/70 lg:text-left lg:text-xl'
+            className='text-center text-base leading-relaxed font-medium text-black/70 lg:text-left lg:text-xl dark:text-white/90'
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.4 }}
@@ -97,8 +97,6 @@ const KitapDetay = () => {
       </motion.div>
 
       <Bolumler kitapId={id} />
-
-      <Comments bookId={id} />
 
       <div className='mt-5'></div>
       <Footer />

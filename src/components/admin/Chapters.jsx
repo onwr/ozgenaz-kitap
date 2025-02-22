@@ -7,6 +7,7 @@ import JoditEditor from 'jodit-react';
 const ChapterModalComponent = memo(
   ({
     showModal,
+    loading,
     editingChapter,
     formData,
     setFormData,
@@ -44,7 +45,7 @@ const ChapterModalComponent = memo(
             config={config}
             onChange={(newContent) => setFormData((prev) => ({ ...prev, content: newContent }))}
           />
-          <div className='flex justify-end gap-2'>
+          <div className='mt-3 flex justify-end gap-2'>
             <button
               onClick={() => {
                 setShowModal(false);
@@ -59,7 +60,8 @@ const ChapterModalComponent = memo(
               onClick={() =>
                 editingChapter ? handleUpdateChapter(editingChapter.id) : handleCreateChapter()
               }
-              className='rounded bg-blue-500 px-4 py-2 text-white'
+              disabled={loading}
+              className='cursor-pointer rounded bg-blue-500 px-4 py-2 text-white'
             >
               {editingChapter ? 'Güncelle' : 'Oluştur'}
             </button>
@@ -71,6 +73,7 @@ const ChapterModalComponent = memo(
 );
 
 const Chapters = ({ adminToken }) => {
+  const API_BASE_URL = 'http://82.29.178.21:3000';
   const [books, setBooks] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedBook, setSelectedBook] = useState(null);
@@ -92,7 +95,7 @@ const Chapters = ({ adminToken }) => {
   );
   const fetchBooks = async () => {
     try {
-      const response = await fetch('http://45.143.4.156:3000/books');
+      const response = await fetch('https://82.29.178.21/books');
       const data = await response.json();
       setBooks(data.books);
       setLoading(false);
@@ -104,7 +107,7 @@ const Chapters = ({ adminToken }) => {
   const fetchChapters = async () => {
     try {
       setLoading(true);
-      const response = await fetch(`http://45.143.4.156:3000/chapters/book/${selectedBook}`);
+      const response = await fetch(`${API_BASE_URL}/chapters/book/${selectedBook}`);
       const data = await response.json();
       setChapters(data);
     } catch (error) {
@@ -131,7 +134,8 @@ const Chapters = ({ adminToken }) => {
 
   const handleCreateChapter = async () => {
     try {
-      const response = await fetch(`http://45.143.4.156:3000/chapters/${selectedBook}`, {
+      setLoading(true);
+      const response = await fetch(`${API_BASE_URL}/chapters/${selectedBook}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -147,12 +151,14 @@ const Chapters = ({ adminToken }) => {
       }
     } catch (error) {
       console.error('Bölüm oluşturulurken hata:', error);
+    } finally {
+      setLoading(false);
     }
   };
 
   const handleUpdateChapter = async (id) => {
     try {
-      const response = await fetch(`http://45.143.4.156:3000/chapters/${id}`, {
+      const response = await fetch(`${API_BASE_URL}/chapters/${id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -175,7 +181,7 @@ const Chapters = ({ adminToken }) => {
   const handleDeleteChapter = async (id) => {
     if (window.confirm('Bu bölümü silmek istediğinizden emin misiniz?')) {
       try {
-        const response = await fetch(`http://45.143.4.156:3000/chapters/${id}`, {
+        const response = await fetch(`${API_BASE_URL}/chapters/${id}`, {
           method: 'DELETE',
           headers: {
             Authorization: `Bearer ${adminToken}`,
@@ -200,6 +206,7 @@ const Chapters = ({ adminToken }) => {
       {showModal && (
         <ChapterModalComponent
           showModal={showModal}
+          loading={loading}
           editingChapter={editingChapter}
           formData={formData}
           setFormData={setFormData}
@@ -256,10 +263,6 @@ const Chapters = ({ adminToken }) => {
                   </button>
                 </div>
               </div>
-              <p
-                className='mt-2 text-center text-sm sm:text-left'
-                dangerouslySetInnerHTML={{ __html: truncateText(chapter.content, 200) }}
-              />
             </div>
           ))}
         </div>

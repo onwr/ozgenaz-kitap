@@ -5,6 +5,7 @@ import SplashScreen from 'src/layout/Loader';
 import JoditEditor from 'jodit-react';
 
 const Books = ({ adminToken }) => {
+  const API_BASE_URL = 'http://82.29.178.21:3000';
   const editor = useRef(null);
   const [books, setBooks] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -59,7 +60,7 @@ const Books = ({ adminToken }) => {
 
   const fetchBooks = async () => {
     try {
-      const response = await fetch('http://45.143.4.156:3000/books');
+      const response = await fetch(`${API_BASE_URL}/books`);
       const data = await response.json();
       setBooks(data.books);
       setLoading(false);
@@ -75,8 +76,8 @@ const Books = ({ adminToken }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     const url = editingBook
-      ? `http://45.143.4.156:3000/books/${editingBook.kitapId}`
-      : 'http://45.143.4.156:3000/books';
+      ? `${API_BASE_URL}/books/${editingBook.kitapId}`
+      : `${API_BASE_URL}/books`;
 
     const method = editingBook ? 'PUT' : 'POST';
 
@@ -117,7 +118,7 @@ const Books = ({ adminToken }) => {
   const handleDelete = async (kitapId) => {
     if (window.confirm('Bu kitabı silmek istediğinizden emin misiniz?')) {
       try {
-        const response = await fetch(`http://45.143.4.156:3000/books/${kitapId}`, {
+        const response = await fetch(`${API_BASE_URL}/books/${kitapId}`, {
           method: 'DELETE',
           headers: {
             Authorization: `Bearer ${adminToken}`,

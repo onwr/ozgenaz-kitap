@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { FaClock } from 'react-icons/fa6';
 import axios from 'axios';
 import { MdDelete } from 'react-icons/md';
 
-const Comments = ({ bookId }) => {
+const Comments = ({ bolumId }) => {
+  const API_BASE_URL = 'http://82.29.178.21:3000';
+
   const adminToken = localStorage.getItem('adminToken');
   const [ad, setAd] = useState('');
   const [comment, setComment] = useState('');
@@ -12,9 +13,15 @@ const Comments = ({ bookId }) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState(null);
 
+  const generateRandomEmail = (username) => {
+    const sanitizedUsername = username.toLowerCase().replace(/[^a-z0-9]/g, '');
+    const randomString = Math.random().toString(36).substring(2, 8);
+    return `${sanitizedUsername}_${randomString}@gmail.com`;
+  };
+
   const deleteComment = async (commentId) => {
     try {
-      const response = await fetch(`http://45.143.4.156:3000/comments/${commentId}`, {
+      const response = await fetch(`${API_BASE_URL}/chapterComments/${commentId}`, {
         method: 'DELETE',
         headers: {
           Authorization: `Bearer ${adminToken}`,
@@ -32,7 +39,11 @@ const Comments = ({ bookId }) => {
 
   const fetchComments = async () => {
     try {
-      const response = await axios.get(`http://45.143.4.156:3000/comments/book/${bookId}`);
+      const response = await axios.get(`${API_BASE_URL}/chapterComments/chapter/${bolumId}`, {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
       setComments(response.data);
     } catch (err) {
       setError('Yorumlar yüklenirken bir hata oluştu.');
@@ -41,30 +52,76 @@ const Comments = ({ bookId }) => {
   };
 
   useEffect(() => {
-    fetchComments();
-  }, [bookId]);
+    let mounted = true;
+
+    const loadComments = async () => {
+      try {
+        const response = await axios.get(`${API_BASE_URL}/chapterComments/chapter/${bolumId}`, {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        });
+        if (mounted) {
+          setComments(response.data);
+          setError(null);
+        }
+      } catch (err) {
+        if (mounted) {
+          setError('Yorumlar yüklenirken bir hata oluştu.');
+          console.error('Error fetching comments:', err);
+        }
+      }
+    };
+
+    if (bolumId) {
+      loadComments();
+    }
+
+    return () => {
+      mounted = false;
+    };
+  }, [bolumId]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (comment.trim()) {
+    if (ad.trim() && comment.trim()) {
       setIsSubmitting(true);
       setError(null);
 
       try {
-        await axios.post(`http://45.143.4.156:3000/comments/${bookId}`, {
-          userId: ad,
-          yorum: comment,
-        });
+        const randomEmail = generateRandomEmail(ad);
+        const response = await axios.post(
+          `${API_BASE_URL}/chapterComments/${bolumId}`,
+          {
+            username: ad.trim(),
+            email: randomEmail,
+            yorum: comment.trim(),
+            chapterId: parseInt(bolumId),
+          },
+          {
+            headers: {
+              'Content-Type': 'application/json',
+              Accept: 'application/json',
+            },
+          }
+        );
 
-        await fetchComments();
-        setAd('');
-        setComment('');
+        if (response.data) {
+          await fetchComments();
+          setAd('');
+          setComment('');
+          setError(null);
+        }
       } catch (err) {
-        setError('Yorum gönderilirken bir hata oluştu.');
-        console.error('Error posting comment:', err);
+        console.error('Error details:', err.response?.data || err.message);
+        setError(
+          err.response?.data?.error || 'Yorum gönderilirken bir hata oluştu. Lütfen tekrar deneyin.'
+        );
       } finally {
         setIsSubmitting(false);
       }
+    } else {
+      setError('Lütfen tüm alanları doldurun.');
     }
   };
 
@@ -88,12 +145,12 @@ const Comments = ({ bookId }) => {
 
   return (
     <motion.div
-      className='z-10 container mx-auto mt-5 gap-5 rounded-2xl border border-black/20 bg-white p-5 dark:bg-gradient-to-b dark:from-[#cfbc95]/70 dark:to-white/20'
+      className='z-10 container mx-auto mt-5 gap-5 rounded-2xl border border-black/20 bg-white p-5 dark:bg-[#262626]'
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.6 }}
     >
-      <h2 className='mb-6 text-2xl font-semibold'>Yorumlar</h2>
+      <h2 className='mb-6 text-2xl font-semibold dark:text-white'>Yorumlar</h2>
 
       <form onSubmit={handleSubmit} className='mb-8'>
         <div className='flex flex-col gap-4'>
@@ -101,15 +158,16 @@ const Comments = ({ bookId }) => {
             value={ad}
             required
             onChange={(e) => setAd(e.target.value)}
-            className='w-full rounded-xl border border-black/20 p-4 focus:ring-2 focus:ring-black/20 focus:outline-none dark:placeholder-black/70'
+            className='w-full rounded-xl border border-black/30 p-4 focus:ring-2 focus:ring-white/20 focus:outline-none dark:border-white/20 dark:text-white dark:placeholder-white/70'
             placeholder='Adınız'
             disabled={isSubmitting}
           />
+          {/* Remove email input */}
           <textarea
             value={comment}
             required
             onChange={(e) => setComment(e.target.value)}
-            className='w-full resize-none rounded-xl border border-black/20 p-4 focus:ring-2 focus:ring-black/20 focus:outline-none dark:placeholder-black/70'
+            className='w-full resize-none rounded-xl border border-black/30 p-4 focus:ring-2 focus:ring-white/20 focus:outline-none dark:border-white/20 dark:text-white dark:placeholder-white/70'
             placeholder='Yorumunuzu yazın...'
             rows='4'
             disabled={isSubmitting}
@@ -131,15 +189,13 @@ const Comments = ({ bookId }) => {
         {comments.map((comment) => (
           <motion.div
             key={comment.id}
-            className='rounded-xl bg-black/5 p-4 dark:border dark:border-black/40 dark:bg-white/70'
+            className='rounded-xl bg-black/5 p-4 dark:border dark:border-black/40 dark:bg-[#1a1a1a]'
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
           >
             <div className='mb-2 flex items-start justify-between'>
-              <h3 className='font-semibold'>{comment.userId}</h3>
-              <div className='flex items-center gap-2 text-sm text-black/60'>
-                <FaClock />
-                {formatDate(comment.created_at)}
+              <h3 className='font-semibold dark:text-white'>{comment.username}</h3>
+              <div className='flex items-center gap-2 text-sm text-black/60 dark:text-white'>
                 {adminToken && (
                   <button
                     onClick={() => deleteComment(comment.id)}
@@ -150,7 +206,7 @@ const Comments = ({ bookId }) => {
                 )}
               </div>
             </div>
-            <p className='text-black/80'>{comment.yorum}</p>
+            <p className='text-black/80 dark:text-white/80'>{comment.yorum}</p>
           </motion.div>
         ))}
 
